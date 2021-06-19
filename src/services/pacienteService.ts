@@ -31,7 +31,7 @@ async function buscaPacientePorCpf(cpf: string) {
 async function buscaUsuarioPaciente(usuario: any) {
     const UsuarioRetorno = await repositorio.buscaUsuarioPaciente(usuario);
 
-    if (UsuarioRetorno.email != undefined && UsuarioRetorno.email == usuario.email && await bcrypt.compare(usuario.senha, UsuarioRetorno.senha)) {
+    if (UsuarioRetorno != null && UsuarioRetorno.email != undefined && UsuarioRetorno.email == usuario.email && await bcrypt.compare(usuario.senha, UsuarioRetorno.senha)) {
         return UsuarioRetorno
     }
     else {
