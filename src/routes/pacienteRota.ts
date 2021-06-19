@@ -71,10 +71,15 @@ routes.post(
     "/Login",
     async (request: any, response: any) => {
         const { email, senha } = request.body;
-        const usuario = { email, senha };
-        const pacienteRetorno = await pacienteServico.buscaUsuarioPaciente(usuario);
+        let usuario: any = { email, senha };
+        let pacienteRetorno = await pacienteServico.buscaUsuarioPaciente(usuario);
         if (pacienteRetorno != null) {
-            return response.status(200).json({ "auth": true, pacienteRetorno });
+            usuario = null;
+            usuario = {
+                email: pacienteRetorno.email,
+                nome: pacienteRetorno.nome,
+            }
+            return response.status(200).json({ "auth": true, usuario });
         }
         return response.status(404).json({ "Falha no Login": "Usuário ou senha incorretos" });
     }
@@ -104,7 +109,7 @@ routes.post("/Register", validations.RegistraUsuarioRules(), validate, async (re
 }
 );
 
-
+// perfect working
 routes.put("/RecuperaSenha", validations.ResetaSenhaValidationRules(), validate, async (request: any, response: any) => {
     const { email, senha } = request.body
     const LoginAtualizado: boolean = await pacienteServico.RecuperaSenha(email, senha);
