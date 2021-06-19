@@ -18,5 +18,5 @@ app.use("/vacina", vacinaRota);
 app.use("/paciente", pacienteRota);
 
 export = app.listen(process.env.PORT || 3333, () => {
-    console.log(color.greenBright("Servidor rodando ", color.blueBright("(☞ﾟヮﾟ)☞")));
+    console.log(color.greenBright("Servidor rodando"));
 });
