@@ -16,7 +16,7 @@ function RegistraUsuarioRules() {
 
         body("senha")
             .notEmpty()
-            .withMessage("Senha obrigatória"),
+            .withMessage("Senha é obrigatória"),
 
         body("email")
             .custom(async (email: string) => {
@@ -32,14 +32,17 @@ function RegistraUsuarioRules() {
     return Errors;
 }
 
-
-
-
-
+function ResetaSenhaValidationRules() {
+    const Errors = [
+        body("email").isEmail().withMessage("Email inválido/obrigatório"),
+        body("senha").notEmpty().withMessage("Senha é obrigatória")
+    ]
+    return Errors
+}
 
 function PacienteValidationRules() {
     return [
-        body("nome").notEmpty().withMessage("Nome: obrigatório!!"),
+        body("nome").notEmpty().withMessage("Nome: Obrigatório"),
         body("nome")
             .isLength({ min: 4, max: 100 })
             .withMessage("Nome: Mínimo 4 caracteres e Máximo 100 caracteres"),
@@ -100,7 +103,8 @@ function PacienteValidationRules() {
     ];
 };
 
-export {
+export default {
     PacienteValidationRules,
-    RegistraUsuarioRules
+    RegistraUsuarioRules,
+    ResetaSenhaValidationRules
 };

@@ -2,8 +2,23 @@ import repositorio from "../data/pacienteRepositorio";
 import bcrypt from "bcryptjs";
 
 
+
+async function RecuperaSenha(email: string, senha: string) {
+    const LoginAtual: any = await repositorio.buscaPacientePorEmail(email);
+    if (LoginAtual != undefined && LoginAtual.email != undefined) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(senha, salt);
+        LoginAtual.senha = hashedPassword
+        await repositorio.atualizaUsuario(LoginAtual);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 //its ok
-async function buscaPaciente() {
+async function buscaPacienteListaPacientes() {
     return repositorio.buscaPaciente();
 };
 
@@ -16,7 +31,7 @@ async function buscaPacientePorCpf(cpf: string) {
 async function buscaUsuarioPaciente(usuario: any) {
     const UsuarioRetorno = await repositorio.buscaUsuarioPaciente(usuario);
 
-    if (UsuarioRetorno.email != undefined && UsuarioRetorno.email == usuario.email && await bcrypt.compare(UsuarioRetorno.senha, usuario.senha)) {
+    if (UsuarioRetorno.email != undefined && UsuarioRetorno.email == usuario.email && await bcrypt.compare(usuario.senha, UsuarioRetorno.senha)) {
         return UsuarioRetorno
     }
     else {
@@ -51,7 +66,7 @@ async function removeUsuario(email: string) {
 };
 
 async function AtualizaCadastro(atualizaCadastro: any) {
-    const CadastroAtualizado = await repositorio.buscaPacientePorEmail(atualizaCadastro.email);
+    const CadastroAtualizado = await repositorio.buscaPacientePorEmail(atualizaCadastro.email)
     if (!CadastroAtualizado) {
         return null;
     }
@@ -72,20 +87,15 @@ async function atualizaPaciente(atualizaPaciente: any) {
     return true;
 };
 
-
-async function verificaEmailSenha(email: string, senha: string) {
-    return await repositorio.verificaEmailSenha(email, senha);
-};
-
 export = {
-    verificaEmailSenha,
     atualizaPaciente,
-    buscaPaciente,
+    buscaPacienteListaPacientes,
     AtualizaCadastro,
     removeUsuario,
     insereUsuario,
     buscaPacientePorEmail,
     buscaPacientePorCpf,
+    RecuperaSenha,
     buscaUsuarioPaciente
 }
 

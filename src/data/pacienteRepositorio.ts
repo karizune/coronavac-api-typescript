@@ -18,6 +18,8 @@ interface Usuario {
     urlImage: string
 }
 
+
+//#region Busca
 async function buscaPaciente() {
     return await repositorio.find();
 }
@@ -31,18 +33,19 @@ async function buscaUsuarioPaciente(usuario: Usuario) {
     return await repositorio.findOne({ email })
 }
 
-async function insereUsuario(usuario: Usuario) {
-    return await repositorio.create(usuario);
-}
-
-async function removeUsuario(email: string) {
-    return await repositorio.deleteOne({ email })
-}
-
 async function buscaPacientePorEmail(email: string) {
     return repositorio.findOne({ email });
 };
+//#endregion
 
+//#region insere
+async function insereUsuario(usuario: Usuario) {
+    return await repositorio.create(usuario);
+}
+//#endregion
+
+
+//#region atualiza
 async function atualizaPaciente(atualizaPaciente: any) {
     const {
         nome,
@@ -83,9 +86,29 @@ async function atualizaPaciente(atualizaPaciente: any) {
     return PacienteAtualizado;
 };
 
-async function verificaEmailSenha(email: string, senha: string) {
-    return repositorio.findOne({ email, senha });
-};
+async function atualizaUsuario(usuarioAtualizado: any) {
+    const { email, senha } = usuarioAtualizado
+
+
+    const atualizado = await repositorio.updateOne(
+        {
+            email
+        },
+        {
+            $set: { senha }
+        }
+    );
+    return atualizado;
+}
+
+//#endregion
+
+
+//#region remove
+async function removeUsuario(email: string) {
+    return await repositorio.deleteOne({ email })
+}
+//#endregion
 
 
 export = {
@@ -96,5 +119,5 @@ export = {
     buscaPaciente,
     atualizaPaciente,
     buscaPacientePorEmail,
-    verificaEmailSenha
+    atualizaUsuario
 }
