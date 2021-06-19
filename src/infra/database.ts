@@ -12,9 +12,9 @@ const connectDB = async () => {
             useCreateIndex: true,
             useFindAndModify: false,
         });
-        console.log(color.greenBright("Conectado ao cluster do MongoDB"));
+        console.log("Conectado ao cluster do MongoDB");
     } catch (error) {
-        console.error(color.redBright("Falha em conectar ao cluster do MongoDB"));
+        console.error("Falha em conectar ao cluster do MongoDB");
         process.exit(1);
     }
 };
