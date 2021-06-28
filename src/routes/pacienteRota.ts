@@ -4,10 +4,17 @@ import pacienteServico from "../services/pacienteService";
 import autenticacaoJWT from "../services/authService";
 import { validate } from "../validators/validator";
 import validations from "../validators/pacienteValidator";
+import paciente from "../models/paciente";
+import Usuario from '../interfaces/IUsuario'
 
 const routes = Router();
 
+
+
 //#region metodos adm
+
+
+
 
 //ok (pegar lista de ususarios)
 routes.get("/", async (request: any, response: any) => {
@@ -15,13 +22,17 @@ routes.get("/", async (request: any, response: any) => {
     return response.json(pacienteRetorno);
 });
 
+routes.post("/User", async (request: any, response: any) => {
+    let { email } = request.body;
+    const Usuario = await pacienteServico.buscaPacientePorEmail(email)
+    return response.json(Usuario);
+})
 
 routes.delete(
     "/RemoveUsuario/:email",
     async (request: any, response: any) => {
         const { email } = request.params;
         const pacienteRetorno = await pacienteServico.removeUsuario(email);
-        console.log(pacienteRetorno)
         if (!pacienteRetorno) {
             return response.status(404).json({ error: "usuario não encontrado!!" });
         }
@@ -29,60 +40,64 @@ routes.delete(
     }
 );
 
-routes.put("/AtualizaCadastro", async (request: any, response: any) => {
-    return response.status(501)
+routes.put("/AtualizaCadastro", validations.CompleteRegisterValidationRules(), validate, async (request: any, response: any) => {
     const {
         nome,
         cpf,
-        altura,
         peso,
-        imc,
-        classificacao,
+        altura,
         dataNascimento,
         cidade,
         UF,
-        listaComorbidades,
         JaTeveCovid,
         email,
-        senha
+        urlImage
     } = request.body
 
-    const AtualizaCadastro = {
+    const AtualizaCadastro: Usuario = {
         nome,
         cpf,
-        altura,
         peso,
-        imc,
-        classificacao,
+        altura,
         dataNascimento,
         cidade,
         UF,
-        listaComorbidades,
         JaTeveCovid,
         email,
-        senha
+        urlImage
     }
     const cadastroAtualizado = await pacienteServico.AtualizaCadastro(AtualizaCadastro)
+    if (cadastroAtualizado) {
+        return response.status(200).json({ "Message": "Cadastro Atualizado" })
+    }
+    else {
+        return response.status(404).json({ "Message": "Email não encontrado" })
+    }
+
 });
 //#endregion
 
 // login funcionando corretamente
-routes.post(
-    "/Login",
-    async (request: any, response: any) => {
-        const { email, senha } = request.body;
-        let usuario: any = { email, senha };
-        let pacienteRetorno = await pacienteServico.buscaUsuarioPaciente(usuario);
-        if (pacienteRetorno != null) {
+routes.post("/Login", async (request: any, response: any) => {
+    const { email, senha } = request.body;
+    let usuario: any = { email, senha };
+    let usuarioRetorno: Usuario = await pacienteServico.buscaUsuarioPaciente(usuario);
+    if (usuarioRetorno != null) {
+        if (pacienteServico.VerificaCadastro(usuarioRetorno)) {
             usuario = null;
             usuario = {
-                email: pacienteRetorno.email,
-                nome: pacienteRetorno.nome,
+                email: usuarioRetorno.email,
+                nome: usuarioRetorno.nome,
+                urlImage: usuarioRetorno.urlImage != undefined ? usuarioRetorno.urlImage : ''
             }
             return response.status(200).json({ "auth": true, usuario });
         }
-        return response.status(404).json({ "Falha no Login": "Usuário ou senha incorretos" });
+        else {
+            return response.status(200).json({ "auth": true, "needMoreInfo": true, usuarioRetorno })
+        }
     }
+    return response.status(404).json({ "Falha no Login": "Usuário ou senha incorretos" });
+}
 );
 
 // ok
@@ -111,15 +126,21 @@ routes.post("/Register", validations.RegistraUsuarioRules(), validate, async (re
 
 // perfect working
 routes.put("/RecuperaSenha", validations.ResetaSenhaValidationRules(), validate, async (request: any, response: any) => {
+
     const { email, senha } = request.body
+
     const LoginAtualizado: boolean = await pacienteServico.RecuperaSenha(email, senha);
+
+
     if (LoginAtualizado) {
         return response.status(200).json({ "Message": "Cadastro Atualizado" })
     }
     else {
         return response.status(404).json({ "Message": "Email não encontrado" })
     }
+
 });
+
 
 
 export = routes;

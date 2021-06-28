@@ -47,50 +47,46 @@ async function insereUsuario(usuario: Usuario) {
 
 //#region atualiza
 async function atualizaPaciente(atualizaPaciente: any) {
+    console.log(atualizaPaciente)
     const {
+        email,
         nome,
         cpf,
-        altura,
         peso,
-        imc,
-        classificacao,
+        altura,
         dataNascimento,
         cidade,
         UF,
-        listaComorbidades,
         JaTeveCovid,
-        email,
-        senha,
+        imc,
+        classificacao
     } = atualizaPaciente;
-    const PacienteAtualizado = await repositorio.updateOne(
+    await repositorio.updateOne(
         {
-            cpf,
-            altura,
-            peso,
-            imc,
-            classificacao,
-            dataNascimento,
-            cidade,
-            UF,
-            listaComorbidades,
-            JaTeveCovid,
             email,
-            senha,
+            nome
         },
         {
             $set: {
-                nome,
+                cpf,
+                peso,
+                altura,
+                dataNascimento,
+                cidade,
+                UF,
+                JaTeveCovid,
+                imc,
+                classificacao
             },
         }
     );
-    return PacienteAtualizado;
+    return true;
 };
 
-async function atualizaUsuario(usuarioAtualizado: any) {
+async function atualizaSenha(usuarioAtualizado: any) {
     const { email, senha } = usuarioAtualizado
 
-
-    const atualizado = await repositorio.updateOne(
+    await repositorio.updateOne(
         {
             email
         },
@@ -98,7 +94,8 @@ async function atualizaUsuario(usuarioAtualizado: any) {
             $set: { senha }
         }
     );
-    return atualizado;
+
+    return true;
 }
 
 //#endregion
@@ -119,5 +116,5 @@ export = {
     buscaPaciente,
     atualizaPaciente,
     buscaPacientePorEmail,
-    atualizaUsuario
+    atualizaSenha
 }

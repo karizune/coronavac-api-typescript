@@ -32,6 +32,22 @@ function RegistraUsuarioRules() {
     return Errors;
 }
 
+function CompleteRegisterValidationRules() {
+    let errors = [
+        body("cpf").custom((value: any) => {
+            if (!validarCPF(value)) throw new Error("CPF: inválido!");
+            return true;
+        }).withMessage("CPF: inválido!"),
+        body("peso").isLength({ min: 1, max: Infinity }).withMessage("Peso: precisa ser maior que 0"),
+        body("altura").isLength({ min: 1, max: Infinity }).withMessage("Altura: precisa ser maior que 0"),
+        body("cidade").notEmpty().withMessage("Cidade: obrigatória"),
+        body("UF").notEmpty().withMessage("Estado: Obrigatório"),
+        body("dataNascimento").notEmpty().withMessage("Data de nascimento: Obrigatório"),
+        body("JaTeveCovid").isBoolean().withMessage("COVID: precisa informar se já teve covid")
+    ]
+    return errors
+}
+
 function ResetaSenhaValidationRules() {
     const Errors = [
         body("email").isEmail().withMessage("Email inválido/obrigatório"),
@@ -106,5 +122,6 @@ function PacienteValidationRules() {
 export default {
     PacienteValidationRules,
     RegistraUsuarioRules,
-    ResetaSenhaValidationRules
+    ResetaSenhaValidationRules,
+    CompleteRegisterValidationRules
 };

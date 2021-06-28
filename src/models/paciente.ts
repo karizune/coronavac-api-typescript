@@ -12,10 +12,12 @@ const pacienteSchema: mongoose.Schema = new mongoose.Schema({
     cidade: String,
     UF: String,
     listaComorbidades: String,
-    JaTeveCovid: String,
+    JaTeveCovid: Boolean,
     email: String,
     senha: String,
     urlImage: String
 });
 
 export = mongoose.model("Paciente", pacienteSchema);
+
+

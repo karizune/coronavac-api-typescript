@@ -1,6 +1,5 @@
 import express from 'express'
 import cors from 'cors';
-import color from 'cli-color';
 
 import Authroutes from './routes/authRota';
 import pacienteRota from './routes/pacienteRota';

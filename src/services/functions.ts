@@ -2,7 +2,7 @@ function imc(peso: number, altura: number) {
     return peso / (altura * altura);
 }
 
-function classificacao(vlrIMC: number) {
+function classificacao(vlrIMC: any) {
     let classification: string = ''
     if (vlrIMC < 18.5) {
         classification = "Peso baixo"
@@ -25,6 +25,6 @@ function classificacao(vlrIMC: number) {
     return classification
 }
 
-export = {
+export default {
     imc, classificacao
 }

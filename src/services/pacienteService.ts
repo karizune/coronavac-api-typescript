@@ -1,16 +1,16 @@
 import repositorio from "../data/pacienteRepositorio";
 import bcrypt from "bcryptjs";
-
+import Usuario from '../interfaces/IUsuario'
 
 
 async function RecuperaSenha(email: string, senha: string) {
+
     const LoginAtual: any = await repositorio.buscaPacientePorEmail(email);
     if (LoginAtual != undefined && LoginAtual.email != undefined) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(senha, salt);
         LoginAtual.senha = hashedPassword
-        await repositorio.atualizaUsuario(LoginAtual);
-        return true;
+        return await repositorio.atualizaSenha(LoginAtual);
     }
     else {
         return false;
@@ -54,6 +54,26 @@ async function insereUsuario(novoUsuario: any) {
     return null;
 }
 
+function VerificaCadastro(usuario: any): boolean {
+    if (
+        usuario.altura != undefined &&
+        usuario.cidade != undefined &&
+        usuario.classificacao != undefined &&
+        usuario.cpf != undefined &&
+        usuario.dataNascimento != undefined &&
+        usuario.email != undefined &&
+        usuario.imc != undefined &&
+        usuario.nome != undefined &&
+        usuario.peso != undefined &&
+        usuario.senha != undefined
+    ) {
+        return true
+    }
+    else {
+        return false
+    }
+}
+
 
 async function removeUsuario(email: string) {
     const pacienteRetorno = await repositorio.buscaPacientePorEmail(email);
@@ -65,12 +85,23 @@ async function removeUsuario(email: string) {
     return true
 };
 
-async function AtualizaCadastro(atualizaCadastro: any) {
-    const CadastroAtualizado = await repositorio.buscaPacientePorEmail(atualizaCadastro.email)
-    if (!CadastroAtualizado) {
-        return null;
+async function AtualizaCadastro(Cadastro: any) {
+    let LoginAtual: Usuario = await repositorio.buscaPacientePorEmail(Cadastro.email);
+    if (LoginAtual != undefined && LoginAtual.email != undefined) {
+        LoginAtual.cpf = Cadastro.cpf
+        LoginAtual.peso = Cadastro.peso
+        LoginAtual.altura = Cadastro.altura
+        LoginAtual.cidade = Cadastro.cidade
+        LoginAtual.UF = Cadastro.UF
+        LoginAtual.dataNascimento = Cadastro.dataNascimento
+        LoginAtual.JaTeveCovid = Cadastro.JaTeveCovid
+        LoginAtual.imc = imc(Cadastro.peso, Cadastro.altura)
+        LoginAtual.classificacao = classificacao(LoginAtual.imc)
+        return repositorio.atualizaPaciente(LoginAtual);
     }
-    return repositorio.atualizaPaciente(atualizaCadastro);
+    else {
+        return false;
+    }
 }
 
 async function atualizaPaciente(atualizaPaciente: any) {
@@ -87,6 +118,36 @@ async function atualizaPaciente(atualizaPaciente: any) {
     return true;
 };
 
+
+function imc(peso: number, altura: number) {
+    return peso / (altura * altura);
+}
+
+function classificacao(vlrIMC: any) {
+    let classification: string = ''
+    if (vlrIMC < 18.5) {
+        classification = "Peso baixo"
+    }
+    else if (vlrIMC >= 18.5 && vlrIMC < 24.9) {
+        classification = "Peso normal"
+    }
+    else if (vlrIMC >= 25.0 && vlrIMC < 29.9) {
+        classification = "Sobrepeso"
+    }
+    else if (vlrIMC >= 30.0 && vlrIMC < 34.9) {
+        classification = "Obesidade de primeiro grau"
+    }
+    else if (vlrIMC >= 35.0 && vlrIMC < 39.9) {
+        classification = "Obesidade severa de segundo grau"
+    }
+    else if (vlrIMC >= 40.0) {
+        classification = "Obesidade severa de terceiro grau"
+    }
+    return classification
+}
+
+
+
 export = {
     atualizaPaciente,
     buscaPacienteListaPacientes,
@@ -96,6 +157,7 @@ export = {
     buscaPacientePorEmail,
     buscaPacientePorCpf,
     RecuperaSenha,
-    buscaUsuarioPaciente
+    buscaUsuarioPaciente,
+    VerificaCadastro
 }
 
