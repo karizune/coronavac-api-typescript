@@ -16,7 +16,7 @@ function RegistraUsuarioRules() {
 
         body("senha")
             .notEmpty()
-            .withMessage("Senha é obrigatória"),
+            .withMessage("Senha é obrigatória").isLength({ min: 6, max: 30 }).withMessage("Minimo de 6 caracteres para senha"),
 
         body("email")
             .custom(async (email: string) => {
@@ -51,7 +51,7 @@ function CompleteRegisterValidationRules() {
 function ResetaSenhaValidationRules() {
     const Errors = [
         body("email").isEmail().withMessage("Email inválido/obrigatório"),
-        body("senha").notEmpty().withMessage("Senha é obrigatória")
+        body("senha").notEmpty().withMessage("Senha é obrigatória").isLength({ min: 6, max: 30 }).withMessage("Minimo de 6 caracteres para senha")
     ]
     return Errors
 }
